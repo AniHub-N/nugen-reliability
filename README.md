@@ -36,7 +36,7 @@ Some things behind those numbers:
 - The sections don't fix unanswerable questions by themselves. Asked for the Karnataka registration fee, both models read the Telangana fee out of the retrieved rule and gave it, the aligned one at confidence 93. That's what the scope check in the checker is for.
 - Consistency is high everywhere, and from memory that's not good news: most questions got the same wrong answer five times. At temperature 0.1 it's a vending machine, it just dispenses the wrong thing reliably. With the sections it's the same machine dispensing mostly the right thing.
 
-Nugen's own evaluation never ran, so there's nothing to set beside ours from their side. The job (`evaluation_01m3ptzh4gn430gz`) sat at `CREATED` with zero samples, its `/status` route returned HTTP 500 on every poll, and `/results` said "not completed yet" (`results/nugen_eval.json`). The model page reports accuracy 0.0 and response time 0.0, which look like placeholders.
+Nugen's own evaluation didn't run while I was testing, so there's nothing to set beside this one from their side. The job (`evaluation_01m3ptzh4gn430gz`) sat at `CREATED` with zero samples, its `/status` route returned HTTP 500 on every poll, and `/results` said "not completed yet" (`results/nugen_eval.json`). It's possible I missed a step that starts it, although I retried it 3 hrs later. The model page shows accuracy 0.0 and response time 0.0, which look like placeholders.
 
 ## The checker
 
