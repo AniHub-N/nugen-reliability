@@ -8,7 +8,7 @@ Corpus: the Real Estate (Regulation and Development) Act, 2016 and the Telangana
 
 It depends on whether the model has the text in front of it. Answering from memory, the aligned model gets 9% of questions right and its confidence is noise (AUROC 0.54): it says you have 30 days to appeal to the Appellate Tribunal at confidence 85, where section 44(2) says sixty. Give it the relevant sections and it gets 67% right, and the same score becomes a good ranking signal (AUROC 0.93). Put a threshold on it plus a deterministic check of every figure in the answer against the text, and, validated leave-one-question-out, the assistant answers 42% of questions, 7% of those answers are wrong or incomplete, and it declines all ten questions the documents can't answer.
 
-The part Nugen might not like: the base model does better than the aligned one in both conditions, and by 17 points once both have the sections.
+The finding I'd most want Nugen to look at: the base model beats the aligned one in both conditions.
 
 ![accuracy with and without the sections; filtering answers by confidence vs the checker](results/checker/checker.png)
 
