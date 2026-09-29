@@ -1,0 +1,19 @@
+{
+  "stat": "conf_mean",
+  "threshold": 87.0,
+  "require_checker": true,
+  "max_error_target": 0.05,
+  "cross_validated": {
+    "shown": 84,
+    "n": 200,
+    "coverage": 0.42,
+    "error": 0.0714285714285714,
+    "correct_kept": 78,
+    "correct_available": 100,
+    "unanswerable_shown": 0,
+    "unanswerable_n": 50,
+    "threshold_min": 86.4,
+    "threshold_max": 87.6
+  },
+  "note": "aligned model with retrieval; threshold chosen on all 40 questions, performance from leave-one-question-out"
+}

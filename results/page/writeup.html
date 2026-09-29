@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RERA Confidence Audit</title>
+<meta name="description" content="Does Nugen's confidence_score tell right answers from wrong ones on Indian real-estate law? An evaluation, and a checker that does the job instead.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column like a gazette page, with statute citations set as
+   margin notes on wide screens (the way the Act prints its section headings) and
+   inline on phones. One exhibit, two charts, one table. */
+:root {
+  --paper: #f7f8f6;        /* slightly green-grey paper, not cream */
+  --ink: #16201d;
+  --ink-2: #4a5652;
+  --rule: #dfe4e1;
+  --accent: #1f5f8b;       /* ledger blue: Nugen's score */
+  --ok: #2f7d4f;           /* checked against the text */
+  --bad: #a3392b;          /* contradicted by the text */
+  --muted-mark: #9aa5a1;
+  --panel: #eef1ef;
+  --f-display: "Literata", Georgia, "Times New Roman", serif;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-label: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121816; --ink: #e6ebe8; --ink-2: #a7b3ae; --rule: #2a3431; --accent: #6aa9d6;
+    --ok: #6cc08d; --bad: #e0806f; --muted-mark: #66736e; --panel: #1a2220; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #121816; --ink: #e6ebe8; --ink-2: #a7b3ae; --rule: #2a3431; --accent: #6aa9d6;
+  --ok: #6cc08d; --bad: #e0806f; --muted-mark: #66736e; --panel: #1a2220; color-scheme: dark;
+}
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 1.0625rem; line-height: 1.6; }
+.page { max-width: 46rem; margin: 0 auto; padding-inline: 1.25rem; padding-block: 3rem 4rem; display: grid; gap: 2.25rem; }
+.page > * { min-width: 0; }
+header { display: grid; gap: 0.9rem; }
+.eyebrow { font-family: var(--f-label); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--f-display); font-weight: 600; font-size: 1.35rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+p { margin: 0; max-width: 65ch; }
+.lede { font-size: 1.2rem; line-height: 1.55; }
+section { display: grid; gap: 0.9rem; }
+.cite { font-family: var(--f-mono); font-size: 0.85em; color: var(--ink-2); white-space: nowrap; }
+.by { font-family: var(--f-label); font-size: 0.85rem; color: var(--ink-2); }
+
+/* the exhibit: one question, two answers, the provision */
+.exhibit { border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule); padding-block: 1.1rem; display: grid; gap: 1rem; }
+.exhibit .q { font-family: var(--f-display); font-size: 1.15rem; font-style: italic; }
+.answers { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.answer { display: grid; gap: 0.4rem; align-content: start; padding: 0.9rem 1rem; background: var(--panel); border-radius: 3px; border-left: 3px solid var(--mark); }
+.answer.bad { --mark: var(--bad); }
+.answer.good { --mark: var(--ok); }
+.answer .who { font-family: var(--f-label); font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.answer .said { font-size: 1rem; }
+.answer .meta { font-family: var(--f-mono); font-size: 0.8rem; color: var(--ink-2); }
+.answer .verdict { font-family: var(--f-label); font-size: 0.85rem; font-weight: 600; color: var(--mark); }
+.provision { font-size: 0.95rem; color: var(--ink-2); border-left: 1px solid var(--rule); padding-left: 1rem; }
+.provision b { color: var(--ink); font-weight: 600; }
+
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.5rem; }
+figure { margin: 0; display: grid; gap: 0.5rem; min-width: 0; }
+figcaption { font-family: var(--f-label); font-size: 0.85rem; color: var(--ink-2); }
+figcaption b { color: var(--ink); font-weight: 600; }
+svg { width: 100%; height: auto; display: block; }
+svg .tick { font-family: var(--f-label); font-size: 11px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+svg .axis { font-family: var(--f-label); font-size: 11.5px; fill: var(--ink-2); }
+svg .val { font-family: var(--f-label); font-size: 12px; font-weight: 600; fill: var(--ink); font-variant-numeric: tabular-nums; }
+svg .lab { font-family: var(--f-label); font-size: 11.5px; fill: var(--ink); }
+svg .lab.accent { fill: var(--accent); }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--f-label); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-weight: 500; color: var(--ink-2); font-size: 0.8rem; border-bottom: 1px solid var(--ink); vertical-align: bottom; white-space: normal; }
+tbody tr.key td { font-weight: 600; }
+
+ol.steps { margin: 0; padding-left: 1.4rem; display: grid; gap: 0.55rem; max-width: 65ch; }
+ol.steps li::marker { font-family: var(--f-label); font-weight: 600; color: var(--ink-2); }
+ul.limits { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.5rem; max-width: 65ch; }
+code { font-family: var(--f-mono); font-size: 0.85em; background: var(--panel); padding: 0.05em 0.3em; border-radius: 2px; }
+pre { font-family: var(--f-mono); font-size: 0.82rem; background: var(--panel); padding: 0.9rem 1rem; border-radius: 3px; overflow-x: auto; margin: 0; line-height: 1.5; }
+footer { border-top: 1px solid var(--rule); padding-top: 1rem; font-family: var(--f-label); font-size: 0.85rem; color: var(--ink-2); display: grid; gap: 0.3rem; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 30rem) { body { font-size: 1rem; } .lede { font-size: 1.08rem; } }
+</style>
+
+<main class="page">
+<header>
+  <div class="eyebrow">Nugen hands-on exercise · RERA Act 2016 and Telangana RERA Rules 2017</div>
+  <h1>Does the confidence score mean anything?</h1>
+  <p class="lede">Only when the model has the law in front of it. Answering from memory, the aligned model got 9% of questions right and its <code>confidence_score</code> was noise (AUROC 0.54). Given the relevant sections, it got 67% right and the same score ranked answers well (AUROC 0.93). Built on that, a confidence threshold plus a plain figure check answers 42% of questions with 7% of those answers wrong, and declines every question the documents can't answer.</p>
+  <p class="by">Anirudh · M.Sc. Mathematics, BITS Hyderabad · September 2026</p>
+</header>
+
+<section class="exhibit" aria-label="Example">
+  <p class="q">“What is the time limit for filing an appeal to the Appellate Tribunal against an order of the Authority?”</p>
+  <div class="answers">
+    <div class="answer bad">
+      <span class="who">Aligned model, from memory</span>
+      <span class="said">“The time limit … is 30 days.”</span>
+      <span class="meta">confidence_score 85 · same answer 5 of 5 times</span>
+      <span class="verdict">Wrong</span>
+    </div>
+    <div class="answer good">
+      <span class="who">Aligned model, given s.44 and the checker</span>
+      <span class="said">“sixty days from the date of receipt …”</span>
+      <span class="meta">every figure found in <span class="cite">Act s.44</span></span>
+      <span class="verdict">Figure right</span>
+    </div>
+  </div>
+  <p class="provision"><span class="cite">s.44(2)</span> Every appeal … shall be preferred within a period of <b>sixty days</b> from the date on which a copy of the direction or order or decision made by the Authority … is received.</p>
+</section>
+
+<section>
+  <h2>What I measured</h2>
+  <p>I aligned <code>llama-v3p2-3b-reasoning</code> on the two documents through the Nugen API, then asked it and its base model 40 questions, each with an answer key checked against the section it comes from: 30 answered somewhere in the Act or the Rules, 10 that sound as if they should be but aren't (Karnataka's fee, GST, stamp duty, a Supreme Court case). Five repeats each, temperature 0.1, once from memory and once with the top four sections from a BM25 search in the prompt. That's 800 calls, scored by deterministic key-fact matching with no LLM judge, and confidence intervals from resampling whole questions.</p>
+</section>
+
+<div class="charts">
+  <figure>
+    <svg id="chart-acc" role="img" aria-label="Share of answerable questions fully correct: base 12% and aligned 9% from memory; base 84% and aligned 67% with the sections in the prompt."></svg>
+    <figcaption><b>Fully correct answers.</b> The sections matter far more than the alignment, and the base model beats the aligned one in both conditions.</figcaption>
+  </figure>
+  <figure>
+    <svg id="chart-filter" role="img" aria-label="With the sections in the prompt, raising the Nugen confidence threshold lowers the share of wrong answers shown; the checker combined with a threshold of 87 shows 42% of responses at 7% error."></svg>
+    <figcaption><b>Filtering the aligned model's answers, with the sections.</b> Blue: raise the Nugen confidence threshold and fewer, better answers get through. From memory the same curve stays above 85% wrong everywhere.</figcaption>
+  </figure>
+</div>
+
+<section>
+  <h2>The numbers</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>aligned, memory</th><th>base, memory</th><th>aligned, sections</th><th>base, sections</th></tr></thead>
+      <tbody>
+        <tr class="key"><td>fully correct</td><td>9%</td><td>12%</td><td>67%</td><td>84%</td></tr>
+        <tr><td>declines unanswerable</td><td>28%</td><td>26%</td><td>42%</td><td>36%</td></tr>
+        <tr><td>same label, all 5 repeats</td><td>72%</td><td>75%</td><td>82%</td><td>88%</td></tr>
+        <tr class="key"><td>AUROC, confidence → correct</td><td>0.54</td><td>no score</td><td>0.93</td><td>no score</td></tr>
+        <tr><td>latency p50 / p95</td><td>1.5 / 3.5 s</td><td>2.8 / 7.1 s</td><td>2.0 / 4.9 s</td><td>3.2 / 6.2 s</td></tr>
+        <tr><td>served OK, first try</td><td>200/200</td><td>200/200</td><td>200/200</td><td>200/200</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The score ranks answers but isn't a probability (ECE 0.25): with the sections, correct answers sit at a median confidence of 90 and wrong or incomplete ones at 81, and above about 88 almost everything is right. From memory the best reading of the stream is the lowest one; with the sections it's the mean. Anyone thresholding this score should check which one they use.</p>
+</section>
+
+<section>
+  <h2>A checker that shows its evidence</h2>
+  <p>About a hundred lines, no model. It refuses any question that names something the documents never mention, and it requires every figure in an answer (days, per cent, rupees, section numbers) to appear in the provisions the model was given. Against Nugen's score on the same responses:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>aligned model, with the sections</th><th>shown</th><th>wrong or incomplete</th><th>unanswerable shown</th></tr></thead>
+      <tbody>
+        <tr><td>no filter</td><td>179/200</td><td>44%</td><td>–</td></tr>
+        <tr><td>checker alone</td><td>135/200</td><td>33%</td><td>4/50</td></tr>
+        <tr><td>confidence ≥ 87 alone, cross-validated</td><td>85/200</td><td>8%</td><td>5/50</td></tr>
+        <tr class="key"><td>confidence ≥ 87 and checker, cross-validated</td><td>84/200</td><td>7%</td><td>0/50</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>With the sections, the score is the better filter for wrong answers, because most remaining errors are incomplete answers and a figure check can't see a missing fact. The checker's contribution is the unanswerable questions: with it, none got through. Asked for Karnataka's registration fee, both models read Telangana's fee out of the retrieved rule and gave it, the aligned one at confidence 93. The threshold is chosen with each question held out in turn, so these numbers aren't flattered by picking the cut on the answers they're scored on.</p>
+</section>
+
+<section>
+  <h2>What this says about alignment</h2>
+  <p>Nugen's auto-generated benchmark, the 30 Q&amp;A pairs the alignment was built around, shares a fact with nine of my questions. From memory the aligned model got those fully right 4 times out of 45 and the base model 11. It said the 500 m² registration threshold and the ₹5,000 appeal fee were “not specified” on every repeat. Its answers are also much shorter than the base model's, which costs it with the sections: 39 of its 150 answers there are the first half of a two-part answer. Nugen's own evaluation of the model never ran; the job stayed at <code>CREATED</code> and its status route returned HTTP 500.</p>
+</section>
+
+<section>
+  <h2>The assistant</h2>
+  <ol class="steps">
+    <li>Scope check. “Karnataka” isn't in the documents, so the question is answered with that fact and no model call.</li>
+    <li>BM25 over sections and rules; the right one is in the top four for 29 of 30 questions.</li>
+    <li>The aligned model answers from those four, streamed, with Nugen's confidence alongside.</li>
+    <li>Figure check against the four provisions, then the confidence threshold. Anything that fails is withheld with the reason and the sections to read instead.</li>
+  </ol>
+<pre>? What is the registration fee for a real estate agent in Telangana?
+The registration fee for a real estate agent shall be ten thousand rupees in case of the
+applicant being an individual or fifty thousand rupees in case of the applicant other
+than an individual.
+
+  ✓ Every figure in the answer appears in Act s.9, Rules r.8, Act s.34, Rules r.11.
+  [Nugen confidence 91/100, needs 87]</pre>
+</section>
+
+<section>
+  <h2>Limits</h2>
+  <ul class="limits">
+    <li>40 questions, one model, one day. The intervals are wide and say so.</li>
+    <li>Every answer key was checked against its cited section, but the question set hasn't had an independent review.</li>
+    <li>Retrieval and the scope check were tuned lightly on these same questions, so their numbers are in-sample.</li>
+    <li>The figure check can't tell a right number attached to the wrong event. The app's own example: “sixty days from receipt of the appeal” passed it; the Act counts from receipt of the order. The threshold caught that one.</li>
+    <li>Serving was clean: all 800 calls succeeded first try, and the alignment finished in 8 minutes. That's one day's result.</li>
+  </ul>
+</section>
+
+<footer>
+  <span>Every SSE event of every response is saved, so every number here is recomputed offline by <code>score.py</code> and <code>checker_eval.py</code>.</span>
+  <span>Code, raw runs and the README: link in the email.</span>
+</footer>
+
+</main>
+
+<script id="data" type="application/json">{"acc": {"closed_book/base": 0.12, "closed_book/aligned": 0.09333333333333334, "retrieval/base": 0.84, "retrieval/aligned": 0.6666666666666666}, "sweep": [{"coverage": 0.89, "error": 0.4382022471910112, "answered": 178}, {"coverage": 0.89, "error": 0.4382022471910112, "answered": 178}, {"coverage": 0.88, "error": 0.43181818181818177, "answered": 176}, {"coverage": 0.875, "error": 0.4285714285714286, "answered": 175}, {"coverage": 0.875, "error": 0.4285714285714286, "answered": 175}, {"coverage": 0.875, "error": 0.4285714285714286, "answered": 175}, {"coverage": 0.875, "error": 0.4285714285714286, "answered": 175}, {"coverage": 0.865, "error": 0.4219653179190751, "answered": 173}, {"coverage": 0.865, "error": 0.4219653179190751, "answered": 173}, {"coverage": 0.86, "error": 0.41860465116279066, "answered": 172}, {"coverage": 0.845, "error": 0.40828402366863903, "answered": 169}, {"coverage": 0.84, "error": 0.40476190476190477, "answered": 168}, {"coverage": 0.84, "error": 0.40476190476190477, "answered": 168}, {"coverage": 0.83, "error": 0.3975903614457831, "answered": 166}, {"coverage": 0.82, "error": 0.3902439024390244, "answered": 164}, {"coverage": 0.815, "error": 0.38650306748466257, "answered": 163}, {"coverage": 0.81, "error": 0.3827160493827161, "answered": 162}, {"coverage": 0.805, "error": 0.3788819875776398, "answered": 161}, {"coverage": 0.805, "error": 0.3788819875776398, "answered": 161}, {"coverage": 0.805, "error": 0.3788819875776398, "answered": 161}, {"coverage": 0.79, "error": 0.36708860759493667, "answered": 158}, {"coverage": 0.785, "error": 0.36305732484076436, "answered": 157}, {"coverage": 0.78, "error": 0.3589743589743589, "answered": 156}, {"coverage": 0.78, "error": 0.3589743589743589, "answered": 156}, {"coverage": 0.775, "error": 0.3548387096774194, "answered": 155}, {"coverage": 0.755, "error": 0.3377483443708609, "answered": 151}, {"coverage": 0.75, "error": 0.33333333333333337, "answered": 150}, {"coverage": 0.75, "error": 0.33333333333333337, "answered": 150}, {"coverage": 0.725, "error": 0.31034482758620685, "answered": 145}, {"coverage": 0.715, "error": 0.30069930069930073, "answered": 143}, {"coverage": 0.715, "error": 0.30069930069930073, "answered": 143}, {"coverage": 0.705, "error": 0.2907801418439716, "answered": 141}, {"coverage": 0.705, "error": 0.2907801418439716, "answered": 141}, {"coverage": 0.655, "error": 0.2442748091603053, "answered": 131}, {"coverage": 0.645, "error": 0.24031007751937983, "answered": 129}, {"coverage": 0.63, "error": 0.2222222222222222, "answered": 126}, {"coverage": 0.61, "error": 0.2295081967213115, "answered": 122}, {"coverage": 0.57, "error": 0.24561403508771928, "answered": 114}, {"coverage": 0.57, "error": 0.24561403508771928, "answered": 114}, {"coverage": 0.565, "error": 0.24778761061946908, "answered": 113}, {"coverage": 0.555, "error": 0.23423423423423428, "answered": 111}, {"coverage": 0.55, "error": 0.23636363636363633, "answered": 110}, {"coverage": 0.535, "error": 0.2149532710280374, "answered": 107}, {"coverage": 0.53, "error": 0.2075471698113207, "answered": 106}, {"coverage": 0.48, "error": 0.125, "answered": 96}, {"coverage": 0.48, "error": 0.125, "answered": 96}, {"coverage": 0.45, "error": 0.07777777777777772, "answered": 90}, {"coverage": 0.45, "error": 0.07777777777777772, "answered": 90}, {"coverage": 0.4, "error": 0.025000000000000022, "answered": 80}, {"coverage": 0.375, "error": 0.013333333333333308, "answered": 75}, {"coverage": 0.35, "error": 0.014285714285714235, "answered": 70}, {"coverage": 0.33, "error": 0.015151515151515138, "answered": 66}, {"coverage": 0.315, "error": 0.015873015873015928, "answered": 63}, {"coverage": 0.295, "error": 0.016949152542372836, "answered": 59}, {"coverage": 0.265, "error": 0.018867924528301883, "answered": 53}, {"coverage": 0.25, "error": 0.020000000000000018, "answered": 50}, {"coverage": 0.23, "error": 0.021739130434782594, "answered": 46}, {"coverage": 0.225, "error": 0.022222222222222254, "answered": 45}, {"coverage": 0.21, "error": 0.0, "answered": 42}, {"coverage": 0.195, "error": 0.0, "answered": 39}, {"coverage": 0.195, "error": 0.0, "answered": 39}, {"coverage": 0.185, "error": 0.0, "answered": 37}, {"coverage": 0.185, "error": 0.0, "answered": 37}, {"coverage": 0.175, "error": 0.0, "answered": 35}, {"coverage": 0.145, "error": 0.0, "answered": 29}, {"coverage": 0.145, "error": 0.0, "answered": 29}, {"coverage": 0.115, "error": 0.0, "answered": 23}, {"coverage": 0.075, "error": 0.0, "answered": 15}, {"coverage": 0.05, "error": 0.0, "answered": 10}, {"coverage": 0.005, "error": 0.0, "answered": 1}, {"coverage": 0.005, "error": 0.0, "answered": 1}, {"coverage": 0.0, "error": null, "answered": 0}], "checker": {"coverage": 0.675, "error": 0.32592592592592595}, "nofilter": {"coverage": 0.895, "error": 0.44134078212290506}, "app": {"coverage": 0.42, "error": 0.0714285714285714}}</script>
+<script>
+// Draws the two charts on the write-up page from the JSON in #data.
+// Colours come from CSS custom properties so both themes work.
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+
+  function accuracy(svg) {
+    const W = 420, H = 260, L = 40, R = 12, T = 18, B = 46;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.innerHTML = "";
+    const y = (v) => T + (H - T - B) * (1 - v / 100);
+    for (const t of [0, 25, 50, 75, 100]) {
+      el("line", { x1: L, x2: W - R, y1: y(t), y2: y(t), stroke: css("--rule"), "stroke-width": 1 }, svg);
+      el("text", { x: L - 8, y: y(t) + 4, "text-anchor": "end", class: "tick" }, svg, t + "%");
+    }
+    const groups = [["from memory", "closed_book"], ["with the sections", "retrieval"]];
+    const models = [["base", "--muted-mark"], ["aligned", "--accent"]];
+    const gw = (W - L - R) / groups.length, bw = 44;
+    groups.forEach(([label, key], gi) => {
+      const cx = L + gw * gi + gw / 2;
+      models.forEach(([m, col], mi) => {
+        const v = 100 * D.acc[`${key}/${m}`];
+        const x = cx + (mi - 1) * (bw + 6) + 3;
+        el("rect", { x, y: y(v), width: bw, height: y(0) - y(v), fill: css(col), rx: 2 }, svg);
+        el("text", { x: x + bw / 2, y: y(v) - 6, "text-anchor": "middle", class: "val" }, svg, Math.round(v) + "%");
+        el("text", { x: x + bw / 2, y: y(0) + 15, "text-anchor": "middle", class: "tick" }, svg, m);
+      });
+      el("text", { x: cx, y: H - 8, "text-anchor": "middle", class: "axis" }, svg, label);
+    });
+  }
+
+  function filtering(svg) {
+    const W = 460, H = 300, L = 44, R = 16, T = 16, B = 44;
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.innerHTML = "";
+    const x = (v) => L + (W - L - R) * v / 100, y = (v) => T + (H - T - B) * (1 - v / 100);
+    for (const t of [0, 25, 50, 75, 100]) {
+      el("line", { x1: L, x2: W - R, y1: y(t), y2: y(t), stroke: css("--rule"), "stroke-width": 1 }, svg);
+      el("text", { x: L - 8, y: y(t) + 4, "text-anchor": "end", class: "tick" }, svg, t + "%");
+      el("text", { x: x(t), y: H - 26, "text-anchor": "middle", class: "tick" }, svg, t + "%");
+    }
+    el("text", { x: (L + W - R) / 2, y: H - 6, "text-anchor": "middle", class: "axis" }, svg, "share of responses shown to the user");
+    el("text", { x: 12, y: (T + H - B) / 2, "text-anchor": "middle", class: "axis", transform: `rotate(-90 12 ${(T + H - B) / 2})` }, svg, "shown answers that are wrong");
+    // Nugen confidence sweep as a step line, highest threshold (left) to none (right)
+    const pts = D.sweep.filter((p) => p.answered).sort((a, b) => a.coverage - b.coverage);
+    let d = "";
+    pts.forEach((p, i) => {
+      const px = x(100 * p.coverage), py = y(100 * p.error);
+      d += i ? ` H${px} V${py}` : `M${px} ${py}`;
+    });
+    el("path", { d, fill: "none", stroke: css("--accent"), "stroke-width": 2.2 }, svg);
+    const last = pts[pts.length - 1];
+    el("text", { x: x(100 * last.coverage) - 4, y: y(100 * last.error) - 10, "text-anchor": "end", class: "lab accent" }, svg, "Nugen confidence threshold");
+    const dot = (p, col, label, dy) => {
+      el("circle", { cx: x(100 * p.coverage), cy: y(100 * p.error), r: 6, fill: css(col), stroke: css("--paper"), "stroke-width": 2 }, svg);
+      el("text", { x: x(100 * p.coverage) + 10, y: y(100 * p.error) + dy, class: "lab" }, svg, label);
+    };
+    dot(D.checker, "--ok", "checker alone", 4);
+    if (D.nofilter) dot(D.nofilter, "--muted-mark", "no filter", 16);
+    if (D.app) {
+      const ax = x(100 * D.app.coverage), ay = y(100 * D.app.error);
+      el("rect", { x: ax - 6, y: ay - 6, width: 12, height: 12, transform: `rotate(45 ${ax} ${ay})`, fill: css("--ink"), stroke: css("--paper"), "stroke-width": 2 }, svg);
+      el("text", { x: ax + 11, y: ay - 14, class: "lab" }, svg, "checker + confidence ≥ 87");
+      el("text", { x: ax + 11, y: ay - 1, class: "tick" }, svg, "cross-validated");
+    }
+  }
+
+  const draw = () => {
+    accuracy(document.getElementById("chart-acc"));
+    filtering(document.getElementById("chart-filter"));
+  };
+  draw();
+  if (window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", draw);
+  new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+
+</script>

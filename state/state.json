@@ -1,0 +1,29 @@
+{
+  "document_ids": [
+    "document_01m3pa46qw7xr4qa",
+    "document_01m3pa46regedgnd"
+  ],
+  "documents_uploaded_at": "2026-09-29T15:37:21+0530",
+  "documents_ready": true,
+  "alignments": [
+    {
+      "alignment_id": "alignment_01m3pa4gykzaqndj",
+      "base_model_id": "llama-v3p2-3b-reasoning",
+      "submitted_at": "2026-09-29T15:37:31+0530",
+      "final_status": "READY",
+      "finished_at": "2026-09-29T15:45:53+0530",
+      "error": null,
+      "degraded": null,
+      "stage_failures": null,
+      "model_id": "model_01m3pac11b12qhy1",
+      "evaluation_id": null
+    }
+  ],
+  "base_model_id": "llama-v3p2-3b-reasoning",
+  "benchmark_id": "benchmark_01m3pa4h179hq1k6",
+  "benchmark_status": "READY",
+  "alignment_id": "alignment_01m3pa4gykzaqndj",
+  "model_id": "model_01m3pac11b12qhy1",
+  "deployed_at": "2026-09-29T20:53:03+0530",
+  "nugen_evaluation_id": "evaluation_01m3ptzh4gn430gz"
+}

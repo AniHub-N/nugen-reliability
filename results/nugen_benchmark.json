@@ -1,0 +1,198 @@
+{
+  "benchmark_id": "benchmark_01m3pa4h179hq1k6",
+  "s3_key": null,
+  "s3_url": "https://888054366221-ceai-test-bucket.s3.amazonaws.com/org_5f09648610c1/01M3P1GVGFDQN74N010TZ25KN6/benchmarks/benchmark_01m3pa4h179hq1k6/generated_benchmark_01m3pa4h179hq1k6.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA45RBKIAGR5R6YJMN%2F20260929%2Fap-south-1%2Fs3%2Faws4_request&X-Amz-Date=20260929T100752Z&X-Amz-Expires=7200&X-Amz-SignedHeaders=host&X-Amz-Signature=3226651882d9144320dd1d9164b6edf1cfe773c103e9ec8f1fbb798e12a4fa2a",
+  "document_ids": [
+    "document_01m3pa46qw7xr4qa",
+    "document_01m3pa46regedgnd"
+  ],
+  "samples": [
+    {
+      "sample_num": 1,
+      "instruction": "What is the short title of the Act established on 25th March, 2016?",
+      "response": "The Real Estate (Regulation and Development) Act, 2016.",
+      "image_url": null
+    },
+    {
+      "sample_num": 2,
+      "instruction": "Which authority is established under the Real Estate (Regulation and Development) Act, 2016?",
+      "response": "The Real Estate Regulatory Authority.",
+      "image_url": null
+    },
+    {
+      "sample_num": 3,
+      "instruction": "What is the maximum area of land that can be developed without requiring registration under the Act?",
+      "response": "Five hundred square meters.",
+      "image_url": null
+    },
+    {
+      "sample_num": 4,
+      "instruction": "What is the maximum period for which the registration granted under section 5 can be extended by the Authority?",
+      "response": "The registration granted under section 5 may be extended for a period not exceeding one year.",
+      "image_url": null
+    },
+    {
+      "sample_num": 5,
+      "instruction": "What must the Authority provide to the promoter within seven days after the expiry of the thirty-day period specified under sub-section (1)?",
+      "response": "The Authority shall provide a registration number and a Login Id and password to the promoter.",
+      "image_url": null
+    },
+    {
+      "sample_num": 6,
+      "instruction": "What is the definition of 'force majeure' as stated in the text?",
+      "response": "The expression 'force majeure' shall mean a case of war, flood, drought, fire, cyclone, earthquake or any other calamity caused by nature affecting the regular development of the real estate project.",
+      "image_url": null
+    },
+    {
+      "sample_num": 7,
+      "instruction": "What is the time frame within which the promoter must carry out the responsibilities after obtaining the occupancy certificate?",
+      "response": "The promoter must carry out the responsibilities within three months from the date of issue of the occupancy certificate.",
+      "image_url": null
+    },
+    {
+      "sample_num": 8,
+      "instruction": "What is the maximum term of office for the Chairperson and Members of the Authority?",
+      "response": "The maximum term of office for the Chairperson and Members of the Authority is five years from the date on which they enter upon their office.",
+      "image_url": null
+    },
+    {
+      "sample_num": 9,
+      "instruction": "What must the promoter do if he fails to complete or is unable to give possession of an apartment, plot, or building according to the terms of the agreement for sale?",
+      "response": "The promoter shall be liable on demand to return the amount received by him in respect of that apartment, plot, or building, with interest at such rate as may be prescribed, including compensation in the manner provided under this Act.",
+      "image_url": null
+    },
+    {
+      "sample_num": 10,
+      "instruction": "What is the maximum penalty a promoter may face for contravening the provisions of section 3 of the Act?",
+      "response": "The maximum penalty a promoter may face for contravening the provisions of section 3 is up to ten per cent. of the estimated cost of the real estate project as determined by the Authority.",
+      "image_url": null
+    },
+    {
+      "sample_num": 11,
+      "instruction": "Who shall be the ex officio Chairperson of the Central Advisory Council?",
+      "response": "The Minister to the Government of India in charge of the Ministry of the Central Government dealing with Housing shall be the ex officio Chairperson of the Central Advisory Council.",
+      "image_url": null
+    },
+    {
+      "sample_num": 12,
+      "instruction": "What is the term limit for the Chairperson of the Appellate Tribunal, and under what condition can a person who is a Judge of a High Court not hold office after that term?",
+      "response": "The Chairperson of the Appellate Tribunal shall hold office for a term not exceeding five years, and a person who is a Judge of a High Court shall not hold office after he has attained the age of sixty-seven years.",
+      "image_url": null
+    },
+    {
+      "sample_num": 13,
+      "instruction": "What is the maximum penalty an allottee may face for failing to comply with the orders of the Authority?",
+      "response": "The maximum penalty an allottee may face for failing to comply with the orders of the Authority is up to five percent of the plot, apartment, or building cost.",
+      "image_url": null
+    },
+    {
+      "sample_num": 14,
+      "instruction": "What are the consequences for an allottee who contravenes the orders of the Appellate Tribunal?",
+      "response": "An allottee who contravenes the orders of the Appellate Tribunal may face imprisonment for a term which may extend up to one year or a fine for every day of default, which may cumulatively extend up to ten percent of the plot, apartment, or building cost, or both.",
+      "image_url": null
+    },
+    {
+      "sample_num": 15,
+      "instruction": "According to the text, what factors must the adjudicating officer consider when determining the quantum of compensation or interest under section 71?",
+      "response": "The adjudicating officer must consider the following factors: (a) the amount of disproportionate gain or unfair advantage made as a result of the default; (b) the amount of loss caused as a result of the default; (c) the repetitive nature of the default; and (d) any other factors deemed necessary for justice.",
+      "image_url": null
+    },
+    {
+      "sample_num": 16,
+      "instruction": "What is the short title of the rules mentioned in the text?",
+      "response": "The Telangana State Real Estate (Regulation and Development) Rules, 2017.",
+      "image_url": null
+    },
+    {
+      "sample_num": 17,
+      "instruction": "What is the maximum registration fee for a commercial project where the area of land proposed to be developed exceeds one thousand square meters?",
+      "response": "Ten lakhs rupees.",
+      "image_url": null
+    },
+    {
+      "sample_num": 18,
+      "instruction": "What form must a promoter use to apply for the extension of registration of a project?",
+      "response": "Form ‘E’ annexed to this order.",
+      "image_url": null
+    },
+    {
+      "sample_num": 19,
+      "instruction": "What is the registration fee for a real estate agent who is an individual at the time of application for registration?",
+      "response": "Ten thousand rupees.",
+      "image_url": null
+    },
+    {
+      "sample_num": 20,
+      "instruction": "What is the consolidated monthly salary of the Chairperson of the Authority?",
+      "response": "The Chairperson shall be paid a consolidated monthly salary of one lakh fifty thousand rupees.",
+      "image_url": null
+    },
+    {
+      "sample_num": 21,
+      "instruction": "What is the timeline for the Selection Committee to make its recommendation to the appropriate Government for the appointment of the Chairperson or other Member of the Authority?",
+      "response": "The Selection Committee shall make its recommendation to the appropriate Government within a period of sixty days from the date of reference made under sub-rule (1).",
+      "image_url": null
+    },
+    {
+      "sample_num": 22,
+      "instruction": "What is the fee amount required to file an appeal under sub-section (1) of section 44 of the Act?",
+      "response": "Five thousand rupees.",
+      "image_url": null
+    },
+    {
+      "sample_num": 23,
+      "instruction": "What is the procedure for the Selection Committee to recommend a Member for the Appellate Tribunal, including the timeline for making recommendations and the appointment process by the appropriate Government?",
+      "response": "The Selection Committee may follow such procedure as deemed fit, including appointing a Search Committee to suggest a panel of names. It shall send a panel of two names for each vacancy to the appropriate Government within sixty days from the date of reference. The appropriate Government shall appoint one of the two persons recommended within thirty days from the receipt of the recommendation.",
+      "image_url": null
+    },
+    {
+      "sample_num": 24,
+      "instruction": "What is the maximum time period specified for compliance with the orders of the Authority or the Appellate Tribunal after compounding an offence?",
+      "response": "The maximum time period specified for compliance is thirty days from the date of compounding of the offence.",
+      "image_url": null
+    },
+    {
+      "sample_num": 25,
+      "instruction": "What are the conditions under which the Appellate Tribunal may call upon experts or consultants to assist in its inquiries or proceedings?",
+      "response": "The Appellate Tribunal may call upon such experts or consultants from the fields of economics, commerce, accountancy, real estate, competition, construction, architecture, law or engineering or from any other discipline as it deems necessary.",
+      "image_url": null
+    },
+    {
+      "sample_num": 26,
+      "instruction": "What must the adjudicating officer do if they are satisfied that the complaint does not require any further inquiry?",
+      "response": "The adjudicating officer may dismiss the complaint.",
+      "image_url": null
+    },
+    {
+      "sample_num": 27,
+      "instruction": "What is the minimum period for which the Authority must preserve the accounts and other relevant records prepared at the end of the financial year?",
+      "response": "The Authority must preserve the accounts and other relevant records for a minimum period of five years.",
+      "image_url": null
+    },
+    {
+      "sample_num": 28,
+      "instruction": "What percentage of the amounts realized by the promoter for the real estate project must be deposited in a separate account?",
+      "response": "Seventy percent.",
+      "image_url": null
+    },
+    {
+      "sample_num": 29,
+      "instruction": "What must be certified by an engineer, an architect, and a chartered accountant before the promoter can withdraw amounts from the separate account?",
+      "response": "That the withdrawal is in proportion to the percentage of completion of the project.",
+      "image_url": null
+    },
+    {
+      "sample_num": 30,
+      "instruction": "What is the duration of the registration for a real estate agent as stated in the text?",
+      "response": "The registration is valid for a period of five years.",
+      "image_url": null
+    }
+  ],
+  "metadata": {
+    "type": "generated",
+    "name": null,
+    "description": null,
+    "original_filename": "generated_benchmark_01m3pa4h179hq1k6.json"
+  },
+  "error": null
+}

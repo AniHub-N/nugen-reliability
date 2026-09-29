@@ -1,0 +1,114 @@
+<header>
+  <div class="eyebrow">Nugen hands-on exercise · RERA Act 2016 and Telangana RERA Rules 2017</div>
+  <h1>Does the confidence score mean anything?</h1>
+  <p class="lede">Only when the model has the law in front of it. Answering from memory, the aligned model got {{CB_AL_ACC}} of questions right and its <code>confidence_score</code> was noise (AUROC {{CB_AUC}}). Given the relevant sections, it got {{RAG_AL_ACC}} right and the same score ranked answers well (AUROC {{RAG_AUC}}). Built on that, a confidence threshold plus a plain figure check answers {{APP_COV}} of questions with {{APP_ERR}} of those answers wrong, and declines every question the documents can't answer.</p>
+  <p class="by">Anirudh · M.Sc. Mathematics, BITS Hyderabad · September 2026</p>
+</header>
+
+<section class="exhibit" aria-label="Example">
+  <p class="q">“What is the time limit for filing an appeal to the Appellate Tribunal against an order of the Authority?”</p>
+  <div class="answers">
+    <div class="answer bad">
+      <span class="who">Aligned model, from memory</span>
+      <span class="said">“The time limit … is 30 days.”</span>
+      <span class="meta">confidence_score 85 · same answer 5 of 5 times</span>
+      <span class="verdict">Wrong</span>
+    </div>
+    <div class="answer good">
+      <span class="who">Aligned model, given s.44 and the checker</span>
+      <span class="said">“sixty days from the date of receipt …”</span>
+      <span class="meta">every figure found in <span class="cite">Act s.44</span></span>
+      <span class="verdict">Figure right</span>
+    </div>
+  </div>
+  <p class="provision"><span class="cite">s.44(2)</span> Every appeal … shall be preferred within a period of <b>sixty days</b> from the date on which a copy of the direction or order or decision made by the Authority … is received.</p>
+</section>
+
+<section>
+  <h2>What I measured</h2>
+  <p>I aligned <code>llama-v3p2-3b-reasoning</code> on the two documents through the Nugen API, then asked it and its base model 40 questions, each with an answer key checked against the section it comes from: 30 answered somewhere in the Act or the Rules, 10 that sound as if they should be but aren't (Karnataka's fee, GST, stamp duty, a Supreme Court case). Five repeats each, temperature 0.1, once from memory and once with the top four sections from a BM25 search in the prompt. That's 800 calls, scored by deterministic key-fact matching with no LLM judge, and confidence intervals from resampling whole questions.</p>
+</section>
+
+<div class="charts">
+  <figure>
+    <svg id="chart-acc" role="img" aria-label="Share of answerable questions fully correct: base {{CB_BA_ACC}} and aligned {{CB_AL_ACC}} from memory; base {{RAG_BA_ACC}} and aligned {{RAG_AL_ACC}} with the sections in the prompt."></svg>
+    <figcaption><b>Fully correct answers.</b> The sections matter far more than the alignment, and the base model beats the aligned one in both conditions.</figcaption>
+  </figure>
+  <figure>
+    <svg id="chart-filter" role="img" aria-label="With the sections in the prompt, raising the Nugen confidence threshold lowers the share of wrong answers shown; the checker combined with a threshold of 87 shows 42% of responses at 7% error."></svg>
+    <figcaption><b>Filtering the aligned model's answers, with the sections.</b> Blue: raise the Nugen confidence threshold and fewer, better answers get through. From memory the same curve stays above 85% wrong everywhere.</figcaption>
+  </figure>
+</div>
+
+<section>
+  <h2>The numbers</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>aligned, memory</th><th>base, memory</th><th>aligned, sections</th><th>base, sections</th></tr></thead>
+      <tbody>
+        <tr class="key"><td>fully correct</td><td>{{CB_AL_ACC}}</td><td>{{CB_BA_ACC}}</td><td>{{RAG_AL_ACC}}</td><td>{{RAG_BA_ACC}}</td></tr>
+        <tr><td>declines unanswerable</td><td>{{CB_AL_ABS}}</td><td>{{CB_BA_ABS}}</td><td>{{RAG_AL_ABS}}</td><td>{{RAG_BA_ABS}}</td></tr>
+        <tr><td>same label, all 5 repeats</td><td>{{CB_AL_CONS}}</td><td>{{CB_BA_CONS}}</td><td>{{RAG_AL_CONS}}</td><td>{{RAG_BA_CONS}}</td></tr>
+        <tr class="key"><td>AUROC, confidence → correct</td><td>{{CB_AUC}}</td><td>no score</td><td>{{RAG_AUC}}</td><td>no score</td></tr>
+        <tr><td>latency p50 / p95</td><td>{{CB_AL_LAT}}</td><td>{{CB_BA_LAT}}</td><td>{{RAG_AL_LAT}}</td><td>{{RAG_BA_LAT}}</td></tr>
+        <tr><td>served OK, first try</td><td>200/200</td><td>200/200</td><td>200/200</td><td>200/200</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The score ranks answers but isn't a probability (ECE {{RAG_ECE}}): with the sections, correct answers sit at a median confidence of 90 and wrong or incomplete ones at 81, and above about 88 almost everything is right. From memory the best reading of the stream is the lowest one; with the sections it's the mean. Anyone thresholding this score should check which one they use.</p>
+</section>
+
+<section>
+  <h2>A checker that shows its evidence</h2>
+  <p>About a hundred lines, no model. It refuses any question that names something the documents never mention, and it requires every figure in an answer (days, per cent, rupees, section numbers) to appear in the provisions the model was given. Against Nugen's score on the same responses:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>aligned model, with the sections</th><th>shown</th><th>wrong or incomplete</th><th>unanswerable shown</th></tr></thead>
+      <tbody>
+        <tr><td>no filter</td><td>{{NF_SHOWN}}</td><td>{{NF_ERR}}</td><td>–</td></tr>
+        <tr><td>checker alone</td><td>{{CK_SHOWN}}</td><td>{{CK_ERR}}</td><td>{{CK_UN}}</td></tr>
+        <tr><td>confidence ≥ 87 alone, cross-validated</td><td>{{CO_SHOWN}}</td><td>{{CO_ERR}}</td><td>{{CO_UN}}</td></tr>
+        <tr class="key"><td>confidence ≥ 87 and checker, cross-validated</td><td>{{APP_SHOWN}}</td><td>{{APP_ERR}}</td><td>{{APP_UN}}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>With the sections, the score is the better filter for wrong answers, because most remaining errors are incomplete answers and a figure check can't see a missing fact. The checker's contribution is the unanswerable questions: with it, none got through. Asked for Karnataka's registration fee, both models read Telangana's fee out of the retrieved rule and gave it, the aligned one at confidence 93. The threshold is chosen with each question held out in turn, so these numbers aren't flattered by picking the cut on the answers they're scored on.</p>
+</section>
+
+<section>
+  <h2>What this says about alignment</h2>
+  <p>Nugen's auto-generated benchmark, the 30 Q&amp;A pairs the alignment was built around, shares a fact with nine of my questions. From memory the aligned model got those fully right {{OV_AL}} times out of 45 and the base model {{OV_BA}}. It said the 500 m² registration threshold and the ₹5,000 appeal fee were “not specified” on every repeat. Its answers are also much shorter than the base model's, which costs it with the sections: 39 of its 150 answers there are the first half of a two-part answer. Nugen's own evaluation of the model never ran; the job stayed at <code>CREATED</code> and its status route returned HTTP 500.</p>
+</section>
+
+<section>
+  <h2>The assistant</h2>
+  <ol class="steps">
+    <li>Scope check. “Karnataka” isn't in the documents, so the question is answered with that fact and no model call.</li>
+    <li>BM25 over sections and rules; the right one is in the top four for 29 of 30 questions.</li>
+    <li>The aligned model answers from those four, streamed, with Nugen's confidence alongside.</li>
+    <li>Figure check against the four provisions, then the confidence threshold. Anything that fails is withheld with the reason and the sections to read instead.</li>
+  </ol>
+<pre>? What is the registration fee for a real estate agent in Telangana?
+The registration fee for a real estate agent shall be ten thousand rupees in case of the
+applicant being an individual or fifty thousand rupees in case of the applicant other
+than an individual.
+
+  ✓ Every figure in the answer appears in Act s.9, Rules r.8, Act s.34, Rules r.11.
+  [Nugen confidence 91/100, needs 87]</pre>
+</section>
+
+<section>
+  <h2>Limits</h2>
+  <ul class="limits">
+    <li>40 questions, one model, one day. The intervals are wide and say so.</li>
+    <li>Every answer key was checked against its cited section, but the question set hasn't had an independent review.</li>
+    <li>Retrieval and the scope check were tuned lightly on these same questions, so their numbers are in-sample.</li>
+    <li>The figure check can't tell a right number attached to the wrong event. The app's own example: “sixty days from receipt of the appeal” passed it; the Act counts from receipt of the order. The threshold caught that one.</li>
+    <li>Serving was clean: all 800 calls succeeded first try, and the alignment finished in 8 minutes. That's one day's result.</li>
+  </ul>
+</section>
+
+<footer>
+  <span>Every SSE event of every response is saved, so every number here is recomputed offline by <code>score.py</code> and <code>checker_eval.py</code>.</span>
+  <span>Code, raw runs and the README: link in the email.</span>
+</footer>

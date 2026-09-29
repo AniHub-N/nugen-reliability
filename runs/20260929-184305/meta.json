@@ -1,0 +1,19 @@
+{
+  "started": "2026-09-29T18:43:05+0530",
+  "models": {
+    "aligned": "model_01m3pac11b12qhy1",
+    "base": "llama-v3p2-3b-reasoning"
+  },
+  "system_prompt": "You answer questions about the Real Estate (Regulation and Development) Act, 2016 and the Telangana State Real Estate (Regulation and Development) Rules, 2017. Answer in two or three sentences and cite the section of the Act or the rule number. If the answer is not in the Act or the Telangana Rules, say that it is not in the documents instead of guessing.",
+  "params": {
+    "temperature": 0.1,
+    "max_tokens": 700
+  },
+  "repeats": 5,
+  "n_questions": 40,
+  "questions_file": "eval\\questions.jsonl",
+  "smoke": false,
+  "read_timeout": 30.0,
+  "total_timeout": 120.0,
+  "attempts": 3
+}
