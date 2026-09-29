@@ -158,5 +158,5 @@ Things found before any model ran:
 - The cookbook's `num_questions` is `n_samples` in the current API, and `workflow_id` is optional.
 - The developer edition only takes plain text, so the PDFs have to be converted first. The Act's section headings live in the page margin of the Gazette print and would have been lost without reattaching them.
 - The docs say streaming confidence arrives as separate `{"object": "confidence"}` events but don't give the field name inside them. It turned out to be `confidence_score`, arriving about once every ten tokens. The base model sends none.
-- There's no public price list. The logs estimate the two full runs at $0.06 and $0.27 using placeholder rates from `.env`; the real figure has to come from the dashboard.
+- There's no public price list, so the running cost estimate used guessed rates and came out at $0.33 for everything. The dashboard says ₹343 (about $4): ₹47 for the alignment, ₹60 for 403 base-model calls (about ₹0.20 per 1,000 tokens), and ₹237 for the aligned model, of which only about ₹60 is tokens at that rate. The rest is almost certainly the hours it sat deployed. The estimate was 12× too low, and it couldn't see the biggest cost at all. Undeploy between runs.
 - The MoHUA RERA site was serving an expired TLS certificate, so the Act was downloaded with verification off and checked by hand.
